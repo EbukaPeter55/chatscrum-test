@@ -621,6 +621,7 @@ let LoginComponent = class LoginComponent {
     //Login method
     login() {
         this.dataservice.login();
+        console.log(this.dataservice.username);
     }
 };
 LoginComponent.ctorParameters = () => [
@@ -880,94 +881,6 @@ let TeamtaskcardsComponent = class TeamtaskcardsComponent {
         this.dataservice.project_slack = sessionStorage.getItem('project_slack');
         this.dataservice.user_slack = sessionStorage.getItem('user_slack');
         this.dataservice.slack_username = sessionStorage.getItem('slack_username');
-        this.dataservice.authOptions = {
-            headers: new _angular_common_http__WEBPACK_IMPORTED_MODULE_3__["HttpHeaders"]({ 'Content-Type': 'application/json', 'Authorization': 'JWT ' + sessionStorage.getItem('token') })
-        };
-        this.dataservice.imageAuthOptions = {
-            headers: new _angular_common_http__WEBPACK_IMPORTED_MODULE_3__["HttpHeaders"]({ 'Authorization': 'JWT ' + sessionStorage.getItem('token') })
-        };
-        this.msg_obs = new MutationObserver((mutations) => {
-            var chat_scroll = document.getElementById('chat_div_space');
-            console.log(chat_scroll.scrollHeight - chat_scroll.clientHeight);
-            console.log(chat_scroll.scrollTop);
-            if (this.at_bottom)
-                chat_scroll.scrollTop = chat_scroll.scrollHeight - chat_scroll.clientHeight;
-            console.log(this.messages);
-        });
-        this.websocket = new WebSocket(this.dataservice.websocket + this.dataservice.domain_name + '/scrum/');
-        this.websocket.onopen = (evt) => {
-            Object(rxjs__WEBPACK_IMPORTED_MODULE_4__["forkJoin"])(this.http.get(this.dataservice.domain_protocol + this.dataservice.domain_name + '/scrum/api/scrumprojects/' + this.dataservice.project + '/', this.dataservice.httpOptions), this.http.get(this.dataservice.domain_protocol + this.dataservice.domain_name + '/scrum/api/scrumsprint/?goal_project_id=' + this.dataservice.project, this.dataservice.authOptions))
-                .subscribe(([res1, res2]) => {
-                this.msg_obs.observe(document.getElementById('chat_div_space'), { attributes: true, childList: true, subtree: true });
-                this.dataservice.users = res1['data'];
-                this.dataservice.project_name = res1['project_name'];
-                this.dataservice.to_clear_board = res1['to_clear_board'];
-                this.dataservice.sprints = res2;
-                this.dataservice.project_slack = res1['slack_installed'];
-                this.dataservice.slack_app_id = res1['slack_app_id'];
-                this.websocket.send(JSON.stringify({ 'project_id': this.dataservice.project, 'user': this.dataservice.realname, 'message': '!join ' + this.dataservice.project_name, 'goal_id': 'main_chat_' + this.dataservice.project_name, 'slack_username': this.dataservice.slack_username }));
-                console.log(this.dataservice.users);
-                console.log(this.dataservice.project_slack);
-                console.log(this.dataservice.user_slack);
-                console.log(this.dataservice.slack_app_id);
-                this.filterSprint(res2);
-            }, err => {
-                this.dataservice.message = 'Unexpected Error!';
-                console.log(err);
-            });
-        };
-        // this.websocket.onmessage = (evt) => {
-        //     var data = JSON.parse(evt.data);
-        //     if(data['messages'] !== undefined)
-        //     {
-        //         this.messages = []
-        //         for(var i = 0; i < data['messages']['length']; i++)
-        //         {
-        //             this.messages.push(data['messages'][i]['user'] + ': ' + data['messages'][i]['message']);
-        //         }
-        //     } else
-        //     {
-        //         this.messages.push(data['user'] + ': ' + data['message']);
-        //     }
-        //     this.at_bottom = false;
-        //     var chat_scroll = document.getElementById('chat_div_space');
-        //     if(chat_scroll.scrollTop == chat_scroll.scrollHeight - chat_scroll.clientHeight)
-        //         this.at_bottom = true;
-        // }
-        this.websocket.onmessage = (evt) => {
-            var data = JSON.parse(evt.data);
-            if (data['messages'] !== undefined) {
-                this.messages = [];
-                for (var i = 0; i < data['messages']['length']; i++) {
-                    this.messages.push(data['messages'][i]);
-                    console.log('first');
-                }
-            }
-            else {
-                this.messages.push(data);
-                console.log('second');
-            }
-            console.log(this.messages);
-            // {
-            //     this.messages = []
-            //     for(var i = 0; i < data['messages']['length']; i++)
-            //     {
-            //         this.messages.push(data['messages'][i]['user'] + ': ' + data['messages'][i]['message']);
-            //     }
-            // } else
-            // {
-            //     this.messages.push(data['user'] + ': ' + data['message']);
-            // }
-            console.log(this.messages);
-            this.at_bottom = false;
-            var chat_scroll = document.getElementById('chat_div_space');
-            if (chat_scroll.scrollTop == chat_scroll.scrollHeight - chat_scroll.clientHeight)
-                this.at_bottom = true;
-        };
-        this.websocket.onclose = (evt) => {
-            console.log('Disconnected!');
-            this.msg_obs.disconnect();
-        };
     }
     // Initialise Modal function/method
     modalControl() {

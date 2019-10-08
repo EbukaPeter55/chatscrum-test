@@ -634,6 +634,7 @@ var LoginComponent = /** @class */ (function () {
     //Login method
     LoginComponent.prototype.login = function () {
         this.dataservice.login();
+        console.log(this.dataservice.username);
     };
     LoginComponent.ctorParameters = function () { return [
         { type: _angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"] },
@@ -884,7 +885,6 @@ __webpack_require__.r(__webpack_exports__);
 
 var TeamtaskcardsComponent = /** @class */ (function () {
     function TeamtaskcardsComponent(dataservice, http) {
-        var _this = this;
         this.dataservice = dataservice;
         this.http = http;
         this.messages = [];
@@ -900,95 +900,6 @@ var TeamtaskcardsComponent = /** @class */ (function () {
         this.dataservice.project_slack = sessionStorage.getItem('project_slack');
         this.dataservice.user_slack = sessionStorage.getItem('user_slack');
         this.dataservice.slack_username = sessionStorage.getItem('slack_username');
-        this.dataservice.authOptions = {
-            headers: new _angular_common_http__WEBPACK_IMPORTED_MODULE_3__["HttpHeaders"]({ 'Content-Type': 'application/json', 'Authorization': 'JWT ' + sessionStorage.getItem('token') })
-        };
-        this.dataservice.imageAuthOptions = {
-            headers: new _angular_common_http__WEBPACK_IMPORTED_MODULE_3__["HttpHeaders"]({ 'Authorization': 'JWT ' + sessionStorage.getItem('token') })
-        };
-        this.msg_obs = new MutationObserver(function (mutations) {
-            var chat_scroll = document.getElementById('chat_div_space');
-            console.log(chat_scroll.scrollHeight - chat_scroll.clientHeight);
-            console.log(chat_scroll.scrollTop);
-            if (_this.at_bottom)
-                chat_scroll.scrollTop = chat_scroll.scrollHeight - chat_scroll.clientHeight;
-            console.log(_this.messages);
-        });
-        this.websocket = new WebSocket(this.dataservice.websocket + this.dataservice.domain_name + '/scrum/');
-        this.websocket.onopen = function (evt) {
-            Object(rxjs__WEBPACK_IMPORTED_MODULE_4__["forkJoin"])(_this.http.get(_this.dataservice.domain_protocol + _this.dataservice.domain_name + '/scrum/api/scrumprojects/' + _this.dataservice.project + '/', _this.dataservice.httpOptions), _this.http.get(_this.dataservice.domain_protocol + _this.dataservice.domain_name + '/scrum/api/scrumsprint/?goal_project_id=' + _this.dataservice.project, _this.dataservice.authOptions))
-                .subscribe(function (_a) {
-                var _b = tslib__WEBPACK_IMPORTED_MODULE_0__["__read"](_a, 2), res1 = _b[0], res2 = _b[1];
-                _this.msg_obs.observe(document.getElementById('chat_div_space'), { attributes: true, childList: true, subtree: true });
-                _this.dataservice.users = res1['data'];
-                _this.dataservice.project_name = res1['project_name'];
-                _this.dataservice.to_clear_board = res1['to_clear_board'];
-                _this.dataservice.sprints = res2;
-                _this.dataservice.project_slack = res1['slack_installed'];
-                _this.dataservice.slack_app_id = res1['slack_app_id'];
-                _this.websocket.send(JSON.stringify({ 'project_id': _this.dataservice.project, 'user': _this.dataservice.realname, 'message': '!join ' + _this.dataservice.project_name, 'goal_id': 'main_chat_' + _this.dataservice.project_name, 'slack_username': _this.dataservice.slack_username }));
-                console.log(_this.dataservice.users);
-                console.log(_this.dataservice.project_slack);
-                console.log(_this.dataservice.user_slack);
-                console.log(_this.dataservice.slack_app_id);
-                _this.filterSprint(res2);
-            }, function (err) {
-                _this.dataservice.message = 'Unexpected Error!';
-                console.log(err);
-            });
-        };
-        // this.websocket.onmessage = (evt) => {
-        //     var data = JSON.parse(evt.data);
-        //     if(data['messages'] !== undefined)
-        //     {
-        //         this.messages = []
-        //         for(var i = 0; i < data['messages']['length']; i++)
-        //         {
-        //             this.messages.push(data['messages'][i]['user'] + ': ' + data['messages'][i]['message']);
-        //         }
-        //     } else
-        //     {
-        //         this.messages.push(data['user'] + ': ' + data['message']);
-        //     }
-        //     this.at_bottom = false;
-        //     var chat_scroll = document.getElementById('chat_div_space');
-        //     if(chat_scroll.scrollTop == chat_scroll.scrollHeight - chat_scroll.clientHeight)
-        //         this.at_bottom = true;
-        // }
-        this.websocket.onmessage = function (evt) {
-            var data = JSON.parse(evt.data);
-            if (data['messages'] !== undefined) {
-                _this.messages = [];
-                for (var i = 0; i < data['messages']['length']; i++) {
-                    _this.messages.push(data['messages'][i]);
-                    console.log('first');
-                }
-            }
-            else {
-                _this.messages.push(data);
-                console.log('second');
-            }
-            console.log(_this.messages);
-            // {
-            //     this.messages = []
-            //     for(var i = 0; i < data['messages']['length']; i++)
-            //     {
-            //         this.messages.push(data['messages'][i]['user'] + ': ' + data['messages'][i]['message']);
-            //     }
-            // } else
-            // {
-            //     this.messages.push(data['user'] + ': ' + data['message']);
-            // }
-            console.log(_this.messages);
-            _this.at_bottom = false;
-            var chat_scroll = document.getElementById('chat_div_space');
-            if (chat_scroll.scrollTop == chat_scroll.scrollHeight - chat_scroll.clientHeight)
-                _this.at_bottom = true;
-        };
-        this.websocket.onclose = function (evt) {
-            console.log('Disconnected!');
-            _this.msg_obs.disconnect();
-        };
     }
     // Initialise Modal function/method
     TeamtaskcardsComponent.prototype.modalControl = function () {
