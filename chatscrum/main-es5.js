@@ -702,9 +702,12 @@ var DataService = /** @class */ (function () {
     function DataService(http, router) {
         this.http = http;
         this.router = router;
-        this.domain_name = 'localhost:8000';
-        this.domain_protocol = 'http://';
-        this.websocket = 'ws://';
+        // public domain_name = 'localhost:8000';
+        // public domain_protocol = 'http://';
+        // public websocket = 'ws://';
+        this.domain_name = 'intapi.chatscrum.com';
+        this.domain_protocol = 'https://';
+        this.websocket = 'wss://';
         this.createuser_usertype = "User";
         this.login_fullname = "createuser_fullname";
         this.sprints = [];
